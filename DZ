@@ -1,0 +1,72 @@
+import os
+def load_contacts(filename):
+    contacts = []
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as file:
+            for line in file:
+                parts = line.strip().split(', ')
+                if len(parts) == 4:  # Убедимся, что данные полные
+                    contacts.append({
+                        'surname': parts[0],
+                        'name': parts[1],
+                        'patronymic': parts[2],
+                        'phone': parts[3]
+                    })
+    return contacts
+
+def save_contacts(filename, contacts):
+    with open(filename, 'w', encoding='utf-8') as file:
+        for contact in contacts:
+            file.write(f"{contact['surname']}, {contact['name']}, {contact['patronymic']}, {contact['phone']}\n")
+
+def display_contacts(contacts):
+    if not contacts:
+        print("Справочник пуст.")
+        return
+    for contact in contacts:
+        print(f"{contact['surname']} {contact['name']} {contact['patronymic']} - {contact['phone']}")
+
+def search_contact(contacts, query):
+    results = [contact for contact in contacts if query.lower() in (contact['surname'].lower() + contact['name'].lower() + contact['patronymic'].lower())]
+    return results
+
+def main():
+    filename = 'contacts.txt'
+    contacts = load_contacts(filename)
+
+    while True:
+        print("\nМеню:")
+        print("1. Показать все контакты")
+        print("2. Добавить новый контакт")
+        print("3. Сохранить контакты в файл")
+        print("4. Найти контакт")
+        print("5. Выход")
+
+        choice = input("Выберите действие (1-5): ")
+
+        if choice == '1':
+            display_contacts(contacts)
+        elif choice == '2':
+            surname = input("Введите фамилию: ")
+            name = input("Введите имя: ")
+            patronymic = input("Введите отчество: ")
+            phone = input("Введите номер телефона: ")
+            contacts.append({'surname': surname, 'name': name, 'patronymic': patronymic, 'phone': phone})
+        elif choice == '3':
+            save_contacts(filename, contacts)
+            print("Контакты сохранены в файл.")
+        elif choice == '4':
+            query = input("Введите название для поиска (можно фамилию или имя): ")
+            results = search_contact(contacts, query)
+            if results:
+                print("Найденные контакты:")
+                display_contacts(results)
+            else:
+                print("Контакты не найдены.")
+        elif choice == '5':
+            break
+        else:
+            print("Неправильный выбор. Пожалуйста, попробуйте снова.")
+
+if __name__ == '__main__':
+    main()
